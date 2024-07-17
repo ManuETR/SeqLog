@@ -1,7 +1,6 @@
 <p align="center">
-<img width="322" alt="ROSLogger" src="https://github.com/user-attachments/assets/1bc612dc-1326-42bd-af76-6b13e79c0b7c" />
+<img width="322" alt="ROSLogger" src="https://github.com/user-attachments/assets/cfde7eb6-18ee-4ee3-9ae1-f8cdecf5e8b8" />
 </p>
-
 
 ![Under Construction](https://img.shields.io/badge/status-under%20construction-orange?logo=vlcmediaplayer&logoColor=ffffff)
 ![Author](https://img.shields.io/badge/author-Manuel%20Eiter-blue)
