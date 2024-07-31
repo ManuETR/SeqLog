@@ -1,18 +1,20 @@
 using UnrealBuildTool;
 
-public class PluginTemplate : ModuleRules
+public class SeqLog : ModuleRules
 {
-	public PluginTemplate(ReadOnlyTargetRules Target) : base(Target)
+	public SeqLog(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PrivateIncludePaths.Add("PluginTemplate/Private");
+		PrivateIncludePaths.Add("SeqLog/Private");
 
 		PublicDependencyModuleNames.AddRange
         (
 			new string[]
 			{
-				"Core"
+				"Core",
+        "CoreUObject",
+        "Engine"
 			}
 		);
 
@@ -21,8 +23,12 @@ public class PluginTemplate : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
-				"Engine"
-			}
+				"Engine",
+				"DeveloperSettings",
+        "HTTP",
+				"Core",
+				"Json"
+      }
 		);
 	}
 }

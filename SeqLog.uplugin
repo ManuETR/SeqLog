@@ -1,0 +1,29 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0.0",
+	"FriendlyName": "ROS Logger",
+	"Description": "This Logger allows for logging messages arriving on the ROS Bridge interface",
+	"Category": "Others",
+	"CreatedBy": "Manuel Eiter",
+	"CreatedByURL": "https://github.com/ManuETR/SeqLog",
+	"DocsURL": "https://github.com/ManuETR/SeqLog",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": true,
+	"Modules": [
+		{
+			"Name": "SeqLog",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "SeqLogEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	]
+}
