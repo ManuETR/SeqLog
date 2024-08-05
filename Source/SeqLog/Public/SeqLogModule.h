@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Modules/ModuleInterface.h"
-#include "SeqLog.h"
+#include "SeqLogOutputDevice.h"
 
 class FSeqLogModule : public IModuleInterface
 {
-  FSeqLog* SeqLogSingelton;
+  FSeqLogOutputDevice * SeqLogOutputDeviceSingelton;
 
   virtual void StartupModule() override;
 

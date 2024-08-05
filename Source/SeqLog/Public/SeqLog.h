@@ -7,26 +7,31 @@
 #include "HttpModule.h" // You'll need this for making HTTP requests
 #include "Json.h"
 #include "JsonUtilities.h"
-
+#include "SeqLog.generated.h"
 
 DEFINE_LOG_CATEGORY_STATIC(SeqLog, VeryVerbose, All);
 
 /**
  * Custom logging sink class for sending log messages to Seq.
  */
-class FSeqLog : public FOutputDevice
+UCLASS()
+class SEQLOG_API USeqLog : public UObject
 {
+  GENERATED_BODY()
+
 private:
   const USeqLogSettings* settings;
-  virtual void Serialize(const TCHAR* V, ELogVerbosity::Type Verbosity, const class FName& Category) override;
+  static USeqLog* SeqLogSingelton;
+  TSharedRef<IHttpRequest, ESPMode::ThreadSafe> CreateHttpRequest();
 
 public:
-  FSeqLog();
+  USeqLog();
   /**
    * Function to send log messages to Seq.
    *
    * @param Message   The log message.
    */
-  void Send(const FString& Message);
+  void SendRequest(const FString& Message);
   void Send(const TSharedPtr<FJsonObject>& JsonObject);
+  static USeqLog* Get();
 };

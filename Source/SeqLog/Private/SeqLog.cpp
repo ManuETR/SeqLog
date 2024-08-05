@@ -1,38 +1,61 @@
 #include "SeqLog.h"
 
-FSeqLog::FSeqLog() {
+USeqLog* USeqLog::SeqLogSingelton = nullptr;
+USeqLog::USeqLog() {
   settings = GetDefault<USeqLogSettings>();
 }
 
-void FSeqLog::Serialize(const TCHAR* V, ELogVerbosity::Type Verbosity, const class FName& Category) {
-  if (settings->Enable && Category == TEXT("SeqLog")) {
-    FString LogMessage = FString::Printf(TEXT("%s: %s"), *Category.ToString(), V);
-    Send(LogMessage);
-  }
-}
-
-void FSeqLog::Send(const FString& Message) {
-  // Customize this part to send the log message to your Seq server using HTTP or your preferred method
+TSharedRef<IHttpRequest, ESPMode::ThreadSafe> USeqLog::CreateHttpRequest() {
   FString SeqServerURL = settings->ServerUrl;
   FString SeqApiKey = settings->ApiKey;
 
-  // Construct the HTTP request
   TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = FHttpModule::Get().CreateRequest();
   HttpRequest->SetVerb(TEXT("POST"));
   HttpRequest->SetURL(SeqServerURL);
   HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+  HttpRequest->SetHeader(TEXT("Connection"), TEXT("keep-alive"));
   if (!SeqApiKey.IsEmpty()) {
     HttpRequest->SetHeader(TEXT("X-Seq-ApiKey"), SeqApiKey);
   }
+  return HttpRequest;
+}
+
+void USeqLog::SendRequest(const FString& Message) {
+  // UE_LOG(LogTemp, Log, TEXT("%s"), *Message);
+
+  TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = CreateHttpRequest();
   HttpRequest->SetContentAsString(Message);
 
-  // Send the HTTP request
   HttpRequest->ProcessRequest();
 }
 
-void FSeqLog::Send(const TSharedPtr<FJsonObject>& JsonObject) {
+void USeqLog::Send(const TSharedPtr<FJsonObject>& JsonObject) {
   FString OutputString;
-  TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
-  FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
-  Send(OutputString);
+  FString MessageString;
+  TSharedRef<TJsonWriter<>> OutputWriter = TJsonWriterFactory<>::Create(&OutputString);
+  TSharedRef<TJsonWriter<>> MessageWriter = TJsonWriterFactory<>::Create(&MessageString);
+
+  TSharedPtr<FJsonObject> JsonLog = MakeShareable(new FJsonObject());
+  FJsonSerializer::Serialize(JsonObject.ToSharedRef(), MessageWriter);
+  MessageString.ReplaceInline(TEXT("\n"), TEXT(""));
+  MessageString.ReplaceInline(TEXT("\r"), TEXT(""));
+  MessageString.ReplaceInline(TEXT("\t"), TEXT(""));
+  JsonLog->SetStringField(TEXT("@m"), MessageString);
+  JsonLog->SetStringField(TEXT("@t"), FDateTime::Now().ToIso8601());
+
+  FJsonSerializer::Serialize(JsonLog.ToSharedRef(), OutputWriter);
+  OutputString.ReplaceInline(TEXT("\n"), TEXT(""));
+  OutputString.ReplaceInline(TEXT("\r"), TEXT(""));
+  OutputString.ReplaceInline(TEXT("\t"), TEXT(""));
+  SendRequest(OutputString);
+}
+
+USeqLog* USeqLog::Get()
+{
+  if (!SeqLogSingelton)
+  {
+    SeqLogSingelton = NewObject<USeqLog>();
+    SeqLogSingelton->AddToRoot(); // Prevent garbage collection
+  }
+  return SeqLogSingelton;
 }

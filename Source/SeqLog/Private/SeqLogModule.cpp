@@ -5,15 +5,17 @@
 void FSeqLogModule::StartupModule() 
 {
   // Register the custom logger
-  SeqLogSingelton = new FSeqLog();
+  if (!SeqLogOutputDeviceSingelton) {
+    SeqLogOutputDeviceSingelton = new FSeqLogOutputDevice();
+  }
 
-  GLog->AddOutputDevice(SeqLogSingelton);
+  GLog->AddOutputDevice(SeqLogOutputDeviceSingelton);
 }
 
 void FSeqLogModule::ShutdownModule()
 {
   // Remove the custom logger
-  GLog->RemoveOutputDevice(SeqLogSingelton);
+  GLog->RemoveOutputDevice(SeqLogOutputDeviceSingelton);
 }
 
 IMPLEMENT_MODULE(FSeqLogModule, SeqLog); //Replace with your plugin name

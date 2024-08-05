@@ -14,7 +14,8 @@ public class SeqLog : ModuleRules
 			{
 				"Core",
         "CoreUObject",
-        "Engine"
+        "Engine",
+				"HTTP"
 			}
 		);
 
