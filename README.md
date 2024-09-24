@@ -2,7 +2,6 @@
 <img width="322" alt="ROSLogger" src="https://github.com/user-attachments/assets/174dcc90-0ee3-4cbe-aea7-8798d7ea554d" />
 </p>
 
-# ROSLogger
 ![Under Construction](https://img.shields.io/badge/status-under%20construction-orange?logo=vlcmediaplayer&logoColor=ffffff)
 ![Author](https://img.shields.io/badge/author-Manuel%20Eiter-blue)
 ![Using Unreal Engine](https://img.shields.io/badge/using-Unreal%20Engine-purple?logo=unrealengine)
@@ -10,74 +9,89 @@
 ![Using ROS2 Humble](https://img.shields.io/badge/using-ROS2%20Humble-green?logo=ros)
 ![Static Badge](https://img.shields.io/badge/Patiiiiiii-UNSAFE-red?logo=pipx&logoColor=red&logoSize=Auto)
 
-## Overview
+---
 
-ROSLogger is an Unreal Engine 5.3 plugin designed to log ROS2 messages by fetching them from rosbridge and forwarding them to the internal Unreal Engine log. It allows users to specify which topics and nodes to listen to, facilitating seamless integration of ROS2 systems with Unreal Engine projects.
+# SeqLog Integration for ROS2UE5
+
+**SeqLog** is an Unreal Engine 5 plugin designed to extend the functionality of the **ROS2UE5** repository by providing an interface to the Seq log data sink. It allows you to collect and retrieve detailed simulation data and log information from Cyber-Physical System (CPS) simulations, enhancing your ability to analyze and debug your robotic simulations.
+
+## Table of Contents
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation and Setup Guide](#installation-and-setup-guide)
+  - [1. Install Seq (Datalust)](#1-install-seq-datalust)
+  - [2. Add SeqLog Plugin to Your Unreal Project](#2-add-seqlog-plugin-to-your-unreal-project)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
-- Fetch ROS2 messages from rosbridge
-- Log ROS2 messages to Unreal Engine internal log
-- Specify topics and nodes to listen to
-- Easy integration with Unreal Engine 5.3 projects
+- Logs and stores detailed simulation data from Unreal Engine and ROS2 in **Seq**, a centralized logging platform.
+- Enables easy debugging and performance tracking of Cyber-Physical System simulations.
+- Integrates seamlessly with the **ROS2UE5** plugin for advanced data analysis and monitoring.
 
-## Prerequisites
+## Requirements
 
-- Unreal Engine 5.3
-- ROS2 Humble
+To use the **SeqLog** plugin, you will need the following:
 
-## Installation
+1. **Datalust Seq**: A centralized logging and analytics platform that allows for real-time monitoring of logs and metrics. The recommended way to install Seq is through its Docker container (see installation instructions below).
+   
+2. **Unreal Engine 5.3**: The SeqLog plugin is designed to work with projects built in Unreal Engine version 5.3 or higher.
 
-### ROS2 and rosbridge_suite
+3. **ROS2UE5 Plugin**: While the SeqLog plugin can be used on its own for logging purposes, it is most effective when used alongside the [ROS2UE5 plugin](https://github.com/ManuETR/ROS2UE5) for robotic simulations.
 
-Ensure you have ROS2 Humble and rosbridge_suite installed and running:
+## Installation and Setup Guide
 
-1. Install ROS2 Humble: [ROS2 Installation Guide](https://docs.ros.org/en/humble/Installation.html)
-2. Install rosbridge_suite:
-    ```bash
-    sudo apt update
-    sudo apt install ros-humble-rosbridge-suite
-    ```
-3. Run rosbridge:
-    ```bash
-    ros2 launch rosbridge_server rosbridge_websocket_launch.xml
-    ```
+### 1. Install Seq (Datalust)
 
-### Plugin Installation
+The easiest and most recommended way to install Seq is by using the Docker container provided by Datalust.
 
-1. Clone this repository into your Unreal Engine project's `Plugins` directory:
-    ```bash
-    cd YourUnrealProject/Plugins
-    git clone https://github.com/yourusername/ROSLogger.git
-    ```
+1. First, ensure Docker is installed on your system. You can find Docker installation instructions [here](https://docs.docker.com/get-docker/).
 
-2. Open your Unreal Engine project and navigate to the `Plugins` menu. Enable the "ROSLogger" plugin and restart the editor if prompted.
+2. Run the following command to pull and run the official Seq Docker container:
+   ```bash
+   docker run --name seq -d --restart unless-stopped -e ACCEPT_EULA=Y -p 5341:80 datalust/seq
+   ```
+
+3. Once the container is up and running, Seq will be accessible at `http://localhost:5341`. You can open this URL in your browser to access the Seq dashboard.
+
+4. Optionally, if you want to persist logs across container restarts, you can add a volume to the Docker run command:
+   ```bash
+   docker run --name seq -d --restart unless-stopped -e ACCEPT_EULA=Y -p 5341:80 -v /path/to/seq/log:/data datalust/seq
+   ```
+
+### 2. Add SeqLog Plugin to Your Unreal Project
+
+1. Download or clone the **SeqLog** repository to your local machine:
+   ```bash
+   git clone https://github.com/ManuETR/SeqLog.git
+   ```
+
+2. Copy the `SeqLog` plugin folder into your Unreal project’s `Plugins` directory:
+   ```
+   <YourUnrealProject>/Plugins/SeqLog
+   ```
+
+3. Open your project in Unreal Engine and activate the **SeqLog** plugin:
+   - Go to **Edit** -> **Plugins**.
+   - Search for "SeqLog" and enable the plugin.
+   - Restart Unreal Engine if prompted.
+
+4. In Unreal Engine, navigate to the **SeqLog Settings** in the project settings:
+   - **Edit** -> **Project Settings** -> **SeqLog**
+   - Configure the Seq server URL (e.g., `http://localhost:5341`) to point to your running Seq instance.
 
 ## Usage
 
-### Configuration
+Once the plugin is set up and your project is running:
 
-1. Open the Unreal Engine project settings and navigate to `Plugins > ROSLogger`.
-2. Configure the connection settings for rosbridge:
-    - **WebSocket Address**: The WebSocket address of your rosbridge server (e.g., `ws://localhost:9090`).
-    - **Topics**: List the ROS2 topics you want to listen to.
-    - **Nodes**: List the ROS2 nodes you want to listen to (optional).
+1. **Start Simulation**: Run your simulation in Unreal Engine as usual. SeqLog will automatically send log data to your Seq instance.
 
-### Example
+2. **Monitor Logs in Seq**: Open the Seq dashboard at `http://localhost:5341` to monitor real-time simulation data. You will be able to search, filter, and analyze logs from your simulation.
 
-Here's an example configuration:
+3. **Data Analysis**: Use the Seq query language (SQL-like) to search for specific log events, visualize data trends, and create alerts or dashboards for deeper insights into the performance and behavior of your simulation.
 
-- **WebSocket Address**: `ws://localhost:9090`
-- **Topics**:
-    - `/example_topic1`
-    - `/example_topic2`
-- **Nodes** (optional):
-    - `/example_node1`
+4. **Logging Custom Data**: You can also customize the logging behavior in Unreal Engine to send specific log messages or data points to Seq. See the Unreal Engine logging API for details on how to log custom events.
 
-### Logging
-
-ROS2 messages from the specified topics and nodes will be logged to the Unreal Engine internal log. You can view the log messages in the Output Log window within the Unreal Engine editor.
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request with any improvements or bug fixes.
+---
